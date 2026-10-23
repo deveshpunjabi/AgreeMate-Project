@@ -1,0 +1,56 @@
+# Dependencies & builds
+node_modules
+*/node_modules
+.next
+*/.next
+dist
+build
+*.tsbuildinfo
+
+# Version control & CI
+.git
+.github
+
+# Python caches & virtual environments
+__pycache__
+*/__pycache__
+*.py[cod]
+# Tests & Test Suites (Never build into production images)
+tests
+*/tests
+__tests__
+*/__tests__
+*.test.*
+*.spec.*
+test_*.py
+conftest.py
+pytest.ini
+vitest.config.ts
+vitest.setup.ts
+
+# Internal scripts & Admin seeds
+scripts
+*/scripts
+
+# Environment & Secrets
+.env
+.env.*
+.env.local
+.env.*.local
+
+# Documentation & AI tools
+docs
+.plan
+.agents
+.codex
+.planning
+graphify-out
+.cache
+.venv
+.vscode
+*.log
+scratch
+
+# OS artifacts
+.DS_Store
+Thumbs.db

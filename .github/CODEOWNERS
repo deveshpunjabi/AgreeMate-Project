@@ -1,0 +1,8 @@
+# AgreeMate Repository Code Owners
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+* @deveshpunjabi
+/backend/ @deveshpunjabi
+/frontend/ @deveshpunjabi
+/.github/ @deveshpunjabi
+/infrastructure/ @deveshpunjabi

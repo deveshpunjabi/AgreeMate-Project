@@ -1,0 +1,31 @@
+{
+  "name": "agreemate-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "dev:all": "python run.py",
+    "server": "python run.py",
+    "build": "npm --prefix frontend run build",
+    "start": "npm --prefix frontend run start",
+    "lint": "npm --prefix frontend run lint",
+    "test": "npm --prefix frontend test",
+    "test:backend": "pytest backend/tests",
+    "test:all": "npm --prefix frontend test && pytest backend/tests",
+    "backend:dev": "python -m uvicorn backend.app.main:app --reload --port 8000",
+    "backend:start": "python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000"
+  },
+  "dependencies": {
+    "next": "^16.3.6"
+  },
+  "overrides": {
+    "braces": "^3.0.3"
+  },
+  "allowScripts": {
+    "esbuild": true,
+    "unrs-resolver": true
+  }
+}

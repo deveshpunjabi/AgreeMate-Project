@@ -1,0 +1,70 @@
+# ==============================================================================
+# AgreeMate Production Deployment Ignore Policy (Vercel)
+# Prevents exposing test suites, internal scripts, documentation, and secrets
+# ==============================================================================
+
+# 1. Test Folders & Test Suites (Zero Test Exposure in Production)
+tests/
+*/tests/
+backend/tests/
+frontend/tests/
+__tests__/
+*/__tests__/
+*.test.ts
+*.test.tsx
+*.test.py
+*.spec.ts
+*.spec.tsx
+*.spec.py
+test_*.py
+conftest.py
+pytest.ini
+vitest.config.ts
+vitest.setup.ts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 2. Database Scripts, Admin Seed Tools, & Migrations
+scripts/
+backend/scripts/
+infrastructure/
+docker-compose.yml
+Dockerfile*
+
+# 3. Internal Documentation, Research, Architecture Notes & AI Artifacts
+docs/
+.agents/
+.codex/
+graphify-out/
+.cache/
+.planning/
+scratch/
+*/scratch/
+
+# 4. Environment Variables & Secret Material (Defense in Depth)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+*.log
+npm-debug.log*
+
+# 5. Git, CI/CD, & Editor Configurations
+.git/
+.github/
+.vscode/
+
+# 6. Python Caches & Virtual Envs
+__pycache__/
+*/__pycache__/
+*.py[cod]
+.venv/
+venv/
+ENV/
+env/

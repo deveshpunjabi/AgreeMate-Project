@@ -1,0 +1,61 @@
+name: Frontend CI & Build Gate
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'frontend/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/frontend-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'frontend/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/frontend-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  typecheck-and-build:
+    name: TypeCheck, Lint & Build Next.js App
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Create Mock Environment File
+        run: |
+          echo "NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1" > frontend/.env.local
+          echo "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=mock_cloud" >> frontend/.env.local
+          echo "NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=mock_preset" >> frontend/.env.local
+
+      - name: Install Frontend Dependencies
+        run: |
+          npm ci --no-audit
+
+      - name: Pre-Build Step 1 - ESLint Code Quality Check
+        run: |
+          npm --prefix frontend run lint
+
+      - name: Pre-Build Step 2 - Frontend Unit Tests (Vitest)
+        run: |
+          npm --prefix frontend test
+
+      - name: Build Next.js Production App
+        run: |
+          npm --prefix frontend run build

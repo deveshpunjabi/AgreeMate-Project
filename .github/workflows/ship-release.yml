@@ -1,0 +1,91 @@
+name: Production Ship & Release Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Release version (e.g. v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+permissions:
+  contents: read
+
+jobs:
+  pre-ship-verification:
+    name: Verify Pre-Ship Build & Test Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+
+    env:
+      MONGODB_URL: mongodb://localhost:27017/agreemate_release_test
+      JWT_SECRET: release_test_jwt_secret_key_minimum_32_characters_long
+      JWT_ALGORITHM: HS256
+      PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/backend
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: 587
+      NEXT_TELEMETRY_DISABLED: 1
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: 'backend/requirements.txt'
+
+      - name: Verify Backend Unit & Integration Tests
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest pytest-asyncio httpx
+          python -m pytest tests/
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: Verify Frontend Production Build & Tests
+        run: |
+          npm ci --no-audit
+          npm run lint
+          npm test
+          npm run build
+
+  ship-release:
+    name: Create GitHub Production Release
+    needs: pre-ship-verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Create GitHub Release Artifact
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: AgreeMate Release ${{ github.ref_name }}
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
