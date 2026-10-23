@@ -211,6 +211,7 @@ def generate_invoice_pdf(
         try:
             logo_flowable = RLImage(LOGO_PATH, width=0.45*inch, height=0.45*inch)
         except Exception:
+            # Fall back to text header if image loading or parsing fails
             pass
 
     header_table = Table([

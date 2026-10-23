@@ -1,17 +1,13 @@
 import logging
+from functools import lru_cache
 from typing import Dict, Any
 from backend.app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-# Lazy initialization of Cloudinary SDK
-_cloudinary_initialized = False
 
-def _init_cloudinary():
-    global _cloudinary_initialized
-    if _cloudinary_initialized:
-        return True
-        
+@lru_cache(maxsize=1)
+def _init_cloudinary() -> bool:
     if settings.CLOUDINARY_CLOUD_NAME and settings.CLOUDINARY_API_KEY and settings.CLOUDINARY_API_SECRET:
         try:
             import cloudinary
@@ -22,7 +18,6 @@ def _init_cloudinary():
                 api_secret=settings.CLOUDINARY_API_SECRET,
                 secure=True
             )
-            _cloudinary_initialized = True
             return True
         except ImportError:
             logger.warning("Cloudinary package not installed. Running in mock URL mode.")

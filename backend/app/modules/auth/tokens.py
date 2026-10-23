@@ -3,7 +3,6 @@ from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, Optional
 import hashlib
 import jwt
-from jwt import InvalidTokenError
 from backend.app.core.config import settings
 
 def hash_token(token: str) -> str:
@@ -53,5 +52,5 @@ def verify_token(token: str) -> Optional[Dict[str, Any]]:
             issuer=settings.JWT_ISSUER,
             audience=settings.JWT_AUDIENCE,
         )
-    except InvalidTokenError:
+    except jwt.InvalidTokenError:
         return None

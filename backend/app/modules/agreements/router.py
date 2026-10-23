@@ -1,3 +1,4 @@
+import logging
 import uuid
 import io
 import re
@@ -29,6 +30,7 @@ from backend.app.services.documents.zip_bundler import build_evidence_zip_packet
 from backend.app.modules.agreements.email import send_invite_email
 
 router = APIRouter(prefix="/agreements", tags=["agreements"])
+logger = logging.getLogger(__name__)
 
 def is_agreement_participant(agreement: dict, user_id: str, user_email: Optional[str]) -> bool:
     if not agreement:
@@ -570,6 +572,7 @@ async def send_invite(
     is_existing = bool(borrower_user)
     
     email_sent = False
+    safe_agreement_id = str(agreement_id).replace("\r", "").replace("\n", "")
     try:
         email_sent = await send_invite_email(
             to_email=borrower_email,
@@ -580,8 +583,8 @@ async def send_invite(
             is_existing_user=is_existing
         )
     except Exception as e:
-        import logging
-        logging.getLogger(__name__).warning("Invite email was not sent for %s: %s", agreement_id, e)
+        clean_err = str(e).replace("\r", "").replace("\n", " ")
+        logger.warning("Invite email was not sent for %s: %s", safe_agreement_id, clean_err)
 
     # If the borrower already has an account, dispatch in-app notification
     try:
@@ -594,8 +597,8 @@ async def send_invite(
                 f"You received an agreement invitation for '{item_name}'." if not is_resend else f"Updated invitation received for '{item_name}'."
             )
     except Exception as notif_err:
-        import logging
-        logging.getLogger(__name__).warning("In-app invite alert failed for %s: %s", agreement_id, notif_err)
+        clean_notif_err = str(notif_err).replace("\r", "").replace("\n", " ")
+        logger.warning("In-app invite alert failed for %s: %s", safe_agreement_id, clean_notif_err)
     
     return {
         "invite_url": invite_url,

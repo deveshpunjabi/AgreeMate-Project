@@ -81,7 +81,14 @@ async def seed_admin_safe():
         print(f"  ID:       {admin_user_id}")
         print(f"  Email:    {admin_email}")
         if generated:
-            print(f"  Password (GENERATED): {admin_password}")
+            creds_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".admin_credentials.local"))
+            try:
+                with open(creds_path, "w", encoding="utf-8") as cred_f:
+                    cred_f.write(f"ADMIN_EMAIL={admin_email}\nADMIN_PASSWORD={admin_password}\n")
+                print(f"  Password (GENERATED): [Saved securely to {os.path.basename(creds_path)}]")
+            except Exception:
+                # If writing credentials file fails, advise setting ADMIN_INITIAL_PASSWORD
+                print("  Password (GENERATED): [Generated - Please configure ADMIN_INITIAL_PASSWORD env var]")
             print("  [SECURITY NOTICE] Store this password securely or configure ADMIN_INITIAL_PASSWORD.")
         else:
             print("  Password: [Configured via ADMIN_INITIAL_PASSWORD]")

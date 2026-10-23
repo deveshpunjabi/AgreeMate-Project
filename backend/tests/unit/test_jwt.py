@@ -1,7 +1,7 @@
 import uuid
 import pytest
 import jwt
-from backend.app.modules.auth.jwt import create_access_token, create_refresh_token, verify_token
+from backend.app.modules.auth.tokens import create_access_token, create_refresh_token, verify_token
 from backend.app.core.config import settings
 
 @pytest.fixture

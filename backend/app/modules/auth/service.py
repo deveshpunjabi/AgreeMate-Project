@@ -7,7 +7,7 @@ from pymongo import ReturnDocument
 from backend.app.modules.auth.schemas import SignUpRequest, VerifyOTPRequest, LoginRequest, User
 from backend.app.modules.auth.password import hash_password, verify_password
 from backend.app.modules.auth.otp import generate_otp, check_otp_rate_limit
-from backend.app.modules.auth.jwt import create_access_token, create_refresh_token, verify_token
+from backend.app.modules.auth.tokens import create_access_token, create_refresh_token, verify_token
 from backend.app.modules.security.totp import verify_totp_code
 from backend.app.core.config import settings
 

@@ -37,9 +37,18 @@ const nextConfig: NextConfig = {
         },
       ];
     }
+    let isRender = false;
+    if (backendUrl) {
+      try {
+        const parsed = new URL(backendUrl);
+        isRender = parsed.hostname === 'onrender.com' || parsed.hostname.endsWith('.onrender.com');
+      } catch {
+        // Invalid URL format, treat as non-Render
+      }
+    }
     // In 2-in-1 Vercel deployment, let vercel.json route /api/v1 directly to /api/index.py
     // Only rewrite if an active external or localhost backend is explicitly provided
-    if (backendUrl && !backendUrl.includes('onrender.com')) {
+    if (backendUrl && !isRender) {
       const cleanUrl = backendUrl.replace(/\/+$/, '').replace(/\/api\/v1$/, '');
       return [
         {

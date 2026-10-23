@@ -9,7 +9,7 @@ from backend.app.db.client import get_db
 from backend.app.dependencies import get_current_admin_user
 from backend.app.modules.auth.schemas import User
 from backend.app.modules.auth.password import verify_password
-from backend.app.modules.auth.jwt import create_access_token, create_refresh_token, hash_token
+from backend.app.modules.auth.tokens import create_access_token, create_refresh_token, hash_token
 from backend.app.modules.admin.schemas import (
     AdminStatsResponse,
     AdminChartsResponse,
@@ -512,7 +512,6 @@ async def get_admin_system_health(
             cmd = db.command("ping")
             if hasattr(cmd, "__await__"):
                 await cmd
-                ping_executed = True
     except Exception as e:
         db_status = f"ERROR: {str(e)}"
     latency = round((time.time() - start_t) * 1000, 2)

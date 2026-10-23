@@ -26,13 +26,9 @@ from backend.app.modules.admin.router import router as admin_router
 
 logger = logging.getLogger(__name__)
 
-_indexes_verified = False
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global _indexes_verified
-    
     # 1. Fast cold-start connectivity check
     try:
         await db.client.admin.command("ping")
@@ -41,10 +37,9 @@ async def lifespan(app: FastAPI):
         logger.warning(f"MongoDB ping warning during cold start: {e}")
 
     # 2. In non-production or non-serverless environments, ensure indexes asynchronously once
-    if not _indexes_verified and (settings.ENVIRONMENT != "production" and not os.environ.get("VERCEL")):
+    if settings.ENVIRONMENT != "production" and not os.environ.get("VERCEL"):
         try:
             asyncio.create_task(ensure_indexes(db))
-            _indexes_verified = True
         except Exception as e:
             logger.warning(f"Non-fatal background index check warning: {e}")
 

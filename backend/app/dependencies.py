@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from backend.app.db.client import get_db
-from backend.app.modules.auth.jwt import verify_token
+from backend.app.modules.auth.tokens import verify_token
 from backend.app.modules.auth.schemas import User
 
 security = HTTPBearer()

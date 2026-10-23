@@ -16,6 +16,7 @@ if sys.platform == "win32":
         kernel32 = ctypes.windll.kernel32
         kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
     except Exception:
+        # Ignore if enabling Windows VT100 terminal mode fails on older OS versions
         pass
     os.system("")
 
@@ -66,6 +67,7 @@ def free_ports(ports=(3000, 3001, 8000)):
                                         )
                                         killed_pids.add(pid)
                                 except ValueError:
+                                    # Ignore lines where PID string cannot be parsed as an integer
                                     pass
         except Exception as e:
             print(f"{RED}[PORT]{RESET} Port check error: {e}", flush=True)
@@ -81,6 +83,7 @@ def free_ports(ports=(3000, 3001, 8000)):
                             subprocess.run(["kill", "-9", str(pid)], capture_output=True, check=False)
                             killed_pids.add(pid)
             except Exception:
+                # Ignore process inspection/kill errors on non-Windows platforms
                 pass
 
     if killed_pids:
@@ -103,6 +106,7 @@ def stream_logs(process, prefix_name, color_code, url_callback=None):
                         url_callback(match.group(0))
                 print(f"{color_code}[{prefix_name}]{RESET} {line_str}", flush=True)
     except Exception:
+        # Ignore I/O pipe errors when subprocess stdout is closed during shutdown
         pass
 
 
@@ -118,6 +122,7 @@ def kill_proc_tree(pid):
         else:
             os.killpg(os.getpgid(pid), signal.SIGTERM)
     except Exception:
+        # Ignore process kill errors if process has already terminated
         pass
 
 
@@ -135,6 +140,7 @@ def signal_handler(sig=None, frame=None):
                     kill_proc_tree(proc.pid)
                     proc.terminate()
                 except Exception:
+                    # Ignore errors if process already exited during termination
                     pass
 
     time.sleep(0.2)
@@ -144,6 +150,7 @@ def signal_handler(sig=None, frame=None):
                 try:
                     proc.kill()
                 except Exception:
+                    # Ignore errors if process already exited before kill
                     pass
 
     free_ports([3000, 3001, 8000])
@@ -178,6 +185,7 @@ def check_health(backend_port, frontend_port):
                             backend_ready = True
                             print(f"{GREEN}[BACKEND]{RESET} Ready at http://127.0.0.1:{backend_port} (Docs: http://127.0.0.1:{backend_port}/docs)", flush=True)
                 except Exception:
+                    # Ignore initial connection refusal while backend server is starting up
                     pass
 
         if not frontend_ready:
@@ -187,6 +195,7 @@ def check_health(backend_port, frontend_port):
                         frontend_ready = True
                         print(f"{GREEN}[FRONTEND]{RESET} Ready at http://localhost:{frontend_port}", flush=True)
             except Exception:
+                # Ignore initial connection refusal while frontend dev server is starting up
                 pass
 
         if backend_ready and frontend_ready:
@@ -342,6 +351,7 @@ def main():
                             key, _, value = line.partition("=")
                             frontend_env[key.strip()] = value.strip()
             except Exception:
+                # Ignore .env reading failures; defaults and process environment will be used
                 pass
 
         # Clean any stale/corrupted Turbopack dev cache before launching Next.js
@@ -350,6 +360,7 @@ def main():
             try:
                 shutil.rmtree(stale_dev_cache, ignore_errors=True)
             except Exception:
+                # Ignore dev cache cleanup errors if cache lock is held
                 pass
 
         cmd = find_frontend_command(frontend_dir, args.port)
